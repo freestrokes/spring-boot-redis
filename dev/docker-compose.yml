@@ -1,25 +1,19 @@
 version: "3.9"
 
 services:
-  mysql_assignment_local:
-    image: mysql:5.7.43
-    platform: linux/amd64
-    container_name: mysql_assignment_local
-    environment:
-      - LANG=C.UTF-8
-      - MYSQL_DATABASE=assignmentdb
-      - MYSQL_USER=tester
-      - MYSQL_PASSWORD=tester
-      - MYSQL_ROOT_PASSWORD=root_password
-    command:
-      - --ssl=0
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./.volumes:/var/lib/mysql --user 1000
-      - ./config/db:/docker-entrypoint-initdb.d
-      - ./config:/etc/mysql/conf.d
+  redis_local:
+    image: redis:alpine # 사용할 이미지
+#    image: redis:latest
+    container_name: redis_local
+    hostname: redis_local
+#    volumes: # 스토리지 마운트(볼륨) 설정
+#      - ./redis/data:/data
+#      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    labels: # docker label을 이용한 컨테이너 메타데이터 설정
+      - "name=redis"
+      - "mode=standalone"
+    restart: always # 컨테이너 종료시 재시작 여부
+    command: redis-server --port 6379
+#    command: redis-server /usr/local/conf/redis.conf
     ports:
-      - "3308:3306"
-    healthcheck:
-      test: "mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}"
+      - 6379:6379 # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
